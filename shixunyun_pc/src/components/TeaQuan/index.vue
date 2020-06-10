@@ -239,7 +239,8 @@ export default {
       currentPage: 1,
       insert: false,
       insertFrom: false,
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      value1: ''
     }
   },
   methods: {

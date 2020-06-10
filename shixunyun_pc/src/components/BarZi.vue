@@ -1,10 +1,9 @@
 <template>
  <div class="navMenu">
-
     <label v-for="navMenu in navMenus" :key="navMenu.entity.id">
       <!--只有一级菜单-->
       <el-menu-item v-if="navMenu.childs==null&&navMenu.entity&&navMenu.entity.state==='ENABLE'"
-                    :key="navMenu.entity.id" :data="navMenu" :index="navMenu.entity.name" :route="navMenu.entity.value" @click="con(navMenu.entity.alias)"
+                    :key="navMenu.entity.id" :data="navMenu" :index="navMenu.entity.name" :route="navMenu.entity.value"
                     >
           <!--图标-->
         <i :class="navMenu.entity.icon"></i>
@@ -35,10 +34,6 @@ export default {
     }
   },
   methods: {
-    con (val) {
-      // alert('传递的值：' + val)
-      this.$emit('conFunc', val)
-    }
   }
 }
 </script>

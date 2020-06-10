@@ -4,7 +4,7 @@
     <el-form-item>
         <el-button type="primary" size="small" icon="el-icon-plus" @click="insert=true">新增</el-button>
         <el-button type="danger" size="small" icon="el-icon-delete">批量删除</el-button>
-        <el-dialog title="新增" :visible.sync="insert" class="insert">
+        <el-dialog title="新增" :visible.sync="insert" class="insert" width="65%">
           <el-form :model="form">
           <el-form-item label="专业" :label-width="formLabelWidth">
             <el-select v-model="form.region" placeholder="请选择">
@@ -24,12 +24,7 @@
             <el-input v-model="form.name" placeholder="请输入内容" style="width:217px"></el-input>
             </el-form-item>
             <el-form-item label="答案" :label-width="formLabelWidth">
-            <el-input
-  type="textarea"
-  :rows="2"
-  placeholder="请输入内容"
-  v-model="textarea">
-</el-input>
+              <ue></ue>
             </el-form-item>
             <el-form-item label="示范音视频" :label-width="formLabelWidth">
             <el-upload
@@ -151,6 +146,7 @@
   </div>
 </template>
 <script>
+import ue from '@/components/ue.vue'
 export default {
   name: 'ShiFan',
   data () {
@@ -284,6 +280,9 @@ export default {
     handleSelectionChange (val) {
       console.log(val)
     }
+  },
+  components: {
+    ue
   }
 }
 </script>

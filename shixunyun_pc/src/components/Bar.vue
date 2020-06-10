@@ -12,7 +12,7 @@
       text-color="#fff"
       active-text-color="#409eff"
     >
-    <BarZi :navMenus="barContent" @conFunc="aliasFun"></BarZi>
+    <BarZi :navMenus="barContent"></BarZi>
     </el-menu>
   </div>
 </template>
@@ -475,14 +475,8 @@ export default {
   methods: {
     handleOpen (key, keyPath) {
       this.alias = keyPath
-      console.log(this.alias)
     },
     handleClose (key, keyPath) {
-    },
-    aliasFun (data) {
-      this.alias.push(data)
-      alert(data)
-      this.$store.commit('updateHeaCon', this.alias)
     }
   },
   computed: {

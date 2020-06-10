@@ -34,7 +34,7 @@
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item class="btns">
-          <el-button type="primary" @click="login">登录</el-button>
+          <el-button type="primary" @click="loginToggle">登录</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
       </el-form>
@@ -47,8 +47,8 @@ export default {
   data () {
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: 'admin',
+        password: 'admin'
       },
       loginFormRules: {
         // 验证用户名是否合法
@@ -67,18 +67,10 @@ export default {
   methods: {
     resetLoginForm () {
       // console.log(this)
-      this.$refs.loginFormRef.resetFields()
     },
-    login () {
-      this.$refs.loginFormRef.validate(async valid => {
-        if (!valid) {
-          return
-        }
-        const { data: res } = await this.$http.post('login', this.loginForm)
-        console.log(res)
-        if (res.status !== 200) return console.log('登录失败')
-        console.log('登录成功')
-      })
+    loginToggle () {
+      localStorage.setItem('loginName', 1)
+      this.$router.push('Stu')
     }
   }
 }

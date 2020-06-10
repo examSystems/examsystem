@@ -5,45 +5,44 @@
         <el-button type="primary" size="small" @click="insert=true">新增班级</el-button>
         <!-- 新增弹窗 -->
         <el-dialog title="新增" :visible.sync="insert" class="insert">
-          <el-form :model="form">
+          <el-form :model="insertData">
             <el-form-item label="班级名称" :label-width="formLabelWidth">
-              <el-input v-model="form.name" autocomplete="off" style="width:217px"></el-input>
+              <el-input v-model="insertData.className" autocomplete="off" style="width:217px" placeholder="请输入班级名称"></el-input>
             </el-form-item>
             <el-form-item label="学期" :label-width="formLabelWidth" style="width:80%">
-              <el-select v-model="form.a" placeholder="请选择活动区域">
-                <el-option label="java" value="java"></el-option>
-                <el-option label="前端" value="js"></el-option>
+              <el-select v-model="insertData.grade" placeholder="请选择学期">
+                <el-option label="S1" value="S1"></el-option>
+                <el-option label="S2" value="S2"></el-option>
+                <el-option label="Y2" value="Y2"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="班主任" :label-width="formLabelWidth" style="width:80%">
-              <el-select v-model="form.b" placeholder="请选择活动区域">
-                <el-option label="任1" value="xuanze"></el-option>
-                <el-option label="任2" value="tiankongti"></el-option>
+              <el-select v-model="insertData.classTea" placeholder="请选择班主任">
+                <el-option v-for="(item, index) in classTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="教员" :label-width="formLabelWidth" style="width:80%">
-              <el-select v-model="form.b" placeholder="请选择活动区域">
-                <el-option label="张1" value="xuanze"></el-option>
-                <el-option label="张2" value="tiankongti"></el-option>
+              <el-select v-model="insertData.jiaoTea" placeholder="请选择教员">
+                <el-option v-for="(item, index) in pfiTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="开班时间" :label-width="formLabelWidth">
               <div class="block">
-                <el-date-picker v-model="value1" type="datetime" placeholder="选择日期时间"></el-date-picker>
+                <el-date-picker v-model="insertData.openTime" type="datetime" placeholder="请选择开班时间"></el-date-picker>
               </div>
             </el-form-item>
           </el-form>
           <!-- 取消or保存 -->
           <div slot="footer" class="dialog-footer">
-            <el-button @click="insertFrom = false">取 消</el-button>
-            <el-button type="primary" @click="insertFrom = false">保 存</el-button>
+            <el-button @click="insert = false">取 消</el-button>
+            <el-button type="primary" @click="insertDataFun">新 增</el-button>
           </div>
         </el-dialog>
       </el-form-item>
       <el-row>
         <el-col :span="5">
           <el-form-item label="学期">
-            <el-select v-model="form.region" placeholder="请选择">
+            <el-select v-model="form.grade" placeholder="请选择">
               <el-option label="S1" value="S1"></el-option>
               <el-option label="S2" value="S2"></el-option>
               <el-option label="Y2" value="Y2"></el-option>
@@ -52,25 +51,21 @@
         </el-col>
         <el-col :span="5">
           <el-form-item label="班主任">
-            <el-select v-model="form.region" placeholder="请选择">
-              <el-option label="张三" value="张三"></el-option>
-              <el-option label="李四" value="李四"></el-option>
-              <el-option label="王五" value="王五"></el-option>
+            <el-select v-model="form.classTeacher" placeholder="请选择">
+              <el-option v-for="(item, index) in classTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="5">
           <el-form-item label="教员">
-            <el-select v-model="form.region" placeholder="请选择">
-              <el-option label="赵六" value="赵六"></el-option>
-              <el-option label="Tom" value="Tom"></el-option>
-              <el-option label="qwe" value="qwe"></el-option>
+            <el-select v-model="form.professionalTeacher" placeholder="请选择">
+              <el-option v-for="(item, index) in pfiTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="8">
           <el-form-item style="text-align:right;">
-            <el-button type="primary">查询</el-button>
+            <el-button type="primary" @click="selData">查询</el-button>
           </el-form-item>
         </el-col>
       </el-row>
@@ -78,7 +73,7 @@
     <!-- 数据 -->
     <div class="main">
       <el-table
-        :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)"
+        :data="tableData"
         max-height="418"
         align="center"
         :cell-style="cellStyle"
@@ -87,40 +82,65 @@
         style="width: 100%"
       >
         <el-table-column prop="id" label="班级编号" width="180"></el-table-column>
-        <el-table-column prop="xueQi" label="学期" width="180"></el-table-column>
-        <el-table-column prop="name" label="班级名称" width="180">
+        <el-table-column prop="grade" label="学期" width="180"></el-table-column>
+        <el-table-column prop="className" label="班级名称" width="180"></el-table-column>
+        <el-table-column label="开班时间" width="180">
           <template slot-scope="scope">
-            <el-popover trigger="hover" placement="top">
-              <p>姓名:</p>
-              <p>住址:</p>
-              <p>姓名:</p>
-              <p>住址:</p>
-              <p>姓名:</p>
-              <p>住址:</p>
-              <div slot="reference" class="name-wrapper">
-                <el-tag size="medium">{{ scope.row.name }}</el-tag>
-              </div>
-            </el-popover>
+            <p>{{ scope.row.openTime | openTime('') }}</p>
           </template>
         </el-table-column>
-        <el-table-column prop="kaiTime" label="开班时间" width="180"></el-table-column>
-        <el-table-column prop="jiaoYuan" label="教员"></el-table-column>
-        <el-table-column prop="banZhuRen" label="班主任"></el-table-column>
+        <el-table-column prop="professionalTeacher.teacherName" label="教员"></el-table-column>
+        <el-table-column prop="classTeacher.teacherName" label="班主任"></el-table-column>
         <el-table-column fixed="right" label="操作" width="120">
           <template slot-scope="scope">
             <el-button
-              @click.native.prevent="deleteRow(scope.$index, tableData)"
+              @click.native.prevent="deleteRow(scope.row.id)"
               type="text"
               size="small"
             >移除</el-button>
             <el-button
-              @click.native.prevent="deleteRow(scope.$index, tableData)"
+              @click.native.prevent="updateRow(scope.row,scope.$index)"
               type="text"
               size="small"
             >修改</el-button>
           </template>
         </el-table-column>
       </el-table>
+      <!-- 修改 -->
+        <el-dialog title="修改" :visible.sync="update" class="insert">
+          <el-form :model="updataData">
+            <el-form-item label="班级名称" :label-width="formLabelWidth">
+              <el-input v-model="updataData.className" autocomplete="off" style="width:217px" placeholder="请输入班级名称"></el-input>
+            </el-form-item>
+            <el-form-item label="学期" :label-width="formLabelWidth" style="width:80%">
+              <el-select v-model="updataData.grade" placeholder="请选择学期">
+                <el-option label="S1" value="S1"></el-option>
+                <el-option label="S2" value="S2"></el-option>
+                <el-option label="Y2" value="Y2"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="班主任" :label-width="formLabelWidth" style="width:80%">
+              <el-select v-model="updataData.classTeacherId" placeholder="请选择班主任">
+                <el-option v-for="(item, index) in classTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="教员" :label-width="formLabelWidth" style="width:80%">
+              <el-select v-model="updataData.professionalTeacherId" placeholder="请选择教员">
+                <el-option v-for="(item, index) in pfiTeaData" :key="index" :label="item.name" :value="item.id"></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="开班时间" :label-width="formLabelWidth">
+              <div class="block">
+                <el-date-picker v-model="updataData.openTime" type="datetime" placeholder="请选择开班时间"></el-date-picker>
+              </div>
+            </el-form-item>
+          </el-form>
+          <!-- 取消or保存 -->
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="update = false">取 消</el-button>
+            <el-button type="primary" @click="updateDataFun">修 改</el-button>
+          </div>
+        </el-dialog>
     </div>
     <el-pagination
       background
@@ -129,7 +149,7 @@
       @current-change="handleCurrentChange"
       :current-page="currentPage"
       layout="total, prev, pager, next"
-      :total="tableData.length"
+      :total="total"
     ></el-pagination>
   </div>
 </template>
@@ -139,15 +159,43 @@ export default {
   data () {
     return {
       form: {
-        name: ''
+        name: '',
+        grade: '',
+        professionalTeacher: undefined,
+        classTeacher: undefined
       },
-      tableData: this.$store.state.ban,
-      pagesize: 10,
+      // 班主任的下拉框数据
+      classTeaData: [],
+      // 教员的下拉框数据
+      pfiTeaData: [],
+      // 所有班级数据
+      tableData: [],
+      // 每页显示多少条
+      pagesize: 2,
+      // 默认所有班级总数
+      total: 0,
+      // 分页所在页数
       currentPage: 1,
+      // 新增弹出框显示隐藏的判断变量
       insert: false,
-      insertFrom: false,
+      // 长度样式
       formLabelWidth: '120px',
-      value1: ''
+      insertData: {
+        className: '',
+        grade: '',
+        classTea: '',
+        jiaoTea: '',
+        openTime: ''
+      },
+      update: false,
+      updataData: {
+        id: 0,
+        className: '',
+        grade: '',
+        classTeacherId: '',
+        professionalTeacherId: '',
+        openTime: ''
+      }
     }
   },
   methods: {
@@ -159,13 +207,214 @@ export default {
       return 'text-align:center'
     },
     // 初始页currentPage、初始每页数据数pagesize和数据data
-    handleSizeChange: function (size) {
-      this.pagesize = size
-      console.log(this.pagesize) // 每页下拉显示数据
+    handleSizeChange: function (val) {
+      this.currentPage = val
+      this.selData()
     },
-    handleCurrentChange: function (currentPage) {
-      this.currentPage = currentPage
-      console.log(this.currentPage) // 点击第几页
+    handleCurrentChange: function (val) {
+      this.currentPage = val
+      this.selData()
+    },
+    selAxios () {
+      var that = this
+      this.$axios
+        .get('http://192.168.43.108:8081/examsystem/classForPage', {
+          params: {
+            pageSize: that.pagesize,
+            currentPage: that.currentPage
+          }
+        })
+        .then(response => {
+          // console.log(response)
+          that.tableData = response.data.data.data
+          that.total = response.data.data.total
+        })
+        .catch(function (error) {
+          // 请求失败处理
+          console.log('请求处理失败')
+          console.log(error)
+        })
+    },
+    deleteRow (id) {
+      // 删除代码
+      const that = this
+      console.log('id:' + id)
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          this.$axios
+            .get('http://192.168.43.108:8081/examsystem/deleteClass', {
+              params: {
+                id: id
+              }
+            })
+            .then(response => {
+              console.log(response)
+              if (response.data.success === 'true') {
+                that.$message({
+                  type: 'success',
+                  message: '删除成功!'
+                })
+              } else {
+                that.$message({
+                  type: 'info',
+                  message: response.data.msg
+                })
+              }
+              that.selAxios()
+            })
+            .catch(function (error) {
+              // 请求失败处理
+              console.log(error)
+            })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    selData () {
+      var that = this
+      this.$axios
+        .get('http://192.168.43.108:8081/examsystem/classForPage', {
+          params: {
+            grade: this.form.grade,
+            classTeacherId: this.form.classTeacher,
+            professionalTeacherId: this.form.professionalTeacher,
+            pageSize: that.pagesize,
+            currentPage: that.currentPage
+          }
+        })
+        .then(response => {
+          console.log(response)
+          that.tableData = response.data.data.data
+          that.total = response.data.data.total
+        })
+        .catch(function (error) {
+          // 请求失败处理
+          console.log('请求处理失败')
+          console.log(error)
+        })
+    },
+    insertDataFun () {
+      // 新增
+      this.insert = false
+      const that = this
+      const data = this.$qs.stringify({
+        className: this.insertData.className,
+        grade: this.insertData.grade,
+        openTime: this.insertData.openTime,
+        classTeacherId: this.insertData.classTea,
+        professionalTeacherId: this.insertData.jiaoTea
+      })
+      console.log(data)
+      this.$axios
+        .post('http://192.168.43.108:8081/examsystem/addClass', data)
+        .then(response => {
+          console.log(response)
+          if (response.status === 200) {
+            that.$message('新增成功')
+            this.selAxios()
+          } else {
+            that.$message('新增失败')
+          }
+        })
+        .catch(function (error) {
+          // 请求失败处理
+          console.log('请求处理失败')
+          console.log(error)
+        })
+    },
+    updateRow (data, index) {
+      console.log(this.tableData)
+      this.update = true
+      this.updataData.id = data.id
+      this.updataData.grade = data.grade
+      this.updataData.className = data.className
+      this.updataData.classTeacherId = data.classTeacher.id
+      this.updataData.professionalTeacherId = data.professionalTeacher.id
+      this.updataData.openTime = data.openTime
+    },
+    updateDataFun () {
+      console.log(this.updataData)
+      this.update = false
+      const data = this.$qs.stringify(this.updataData)
+      this.$axios.post('http://192.168.43.108:8081/examsystem/updateClass', data).then(res => {
+        if (res.data.success === 'true') {
+          this.$message('修改成功')
+          this.selAxios()
+        } else {
+          this.$message('修改失败')
+        }
+        console.log(res)
+      })
+    }
+  },
+  mounted () {
+    this.selAxios()
+    this.$axios
+      .get('http://192.168.43.108:8081/examsystem/getAllTeacherNoPage', {
+        params: {
+          positionName: '班主任'
+        }
+      })
+      .then(response => {
+        console.log(response.data)
+        const content = response.data.data
+        var classTeaCon = []
+        for (let i = 0; i < content.length; i++) {
+          classTeaCon.push({ id: content[i].id, name: content[i].teacherName })
+        }
+        this.classTeaData = classTeaCon
+      })
+      .catch(function (error) {
+        // 请求失败处理
+        console.log('请求处理失败')
+        console.log(error)
+      })
+    this.$axios
+      .get('http://192.168.43.108:8081/examsystem/getAllTeacherNoPage', {
+        params: {
+          positionName: '教员'
+        }
+      })
+      .then(response => {
+        // console.log(response.data)
+        const content = response.data.data
+        var jiaoTeaCon = []
+        for (let i = 0; i < content.length; i++) {
+          jiaoTeaCon.push({ id: content[i].id, name: content[i].teacherName })
+        }
+        this.pfiTeaData = jiaoTeaCon
+      })
+      .catch(function (error) {
+        // 请求失败处理
+        console.log('请求处理失败')
+        console.log(error)
+      })
+  },
+  filters: {
+    openTime (val, patten) {
+      var dt = new Date(val)
+
+      // yyyy-mm-dd
+      var yy = dt.getFullYear()
+      var mm = dt.getMonth() + 1
+      var dd = dt.getDate()
+
+      if (patten.toLowerCase() === 'yyyy-mm-dd') {
+        return `${yy}-${mm}-${dd}`
+      } else {
+        var hh = dt.getHours()
+        var ll = dt.getMinutes()
+        var ss = dt.getSeconds()
+        return `${yy}-${mm}-${dd} ${hh}:${ll}:${ss}`
+      }
     }
   }
 }

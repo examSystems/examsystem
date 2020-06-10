@@ -6,11 +6,10 @@
     <div class="yunLeft">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/' }">实训云</el-breadcrumb-item>
-        <el-breadcrumb-item v-for="(item, index) in topText" :key="index">{{ item }}</el-breadcrumb-item>
+        <el-breadcrumb-item v-for="(item, index) in $router.meta" :key="index">{{ item }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="yunRight">
-
         <el-dropdown trigger="click">
       <span class="el-dropdown-link">
         <div class="demo-basic--circle">
@@ -21,7 +20,7 @@
       </span>
       <el-dropdown-menu slot="dropdown">
         <el-dropdown-item>个人中心</el-dropdown-item>
-        <el-dropdown-item divided>退出登录</el-dropdown-item>
+        <el-dropdown-item divided @click.native="tui">退出登录</el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
     </div>
@@ -32,15 +31,21 @@ export default {
   name: 'Header',
   data () {
     return {
-      topText: this.$store.state.headerContent,
-      circleUrl: 'https://c-ssl.duitang.com/uploads/item/201804/26/20180426004149_nluxw.jpg'
+      circleUrl: 'http://www.htxystar.com/upfiles/2019041719254018388.jpg'
     }
   },
   methods: {
     topQie () {
       this.$store.commit('topQieM')
+    },
+    tui () {
+      // localStorage.setItem('loginName', undefined)
+      localStorage.clear()
+      this.$router.push('/login')
+      console.log('点击退出')
     }
-  }
+  },
+  mounted () {}
 }
 </script>
 <style scoped>

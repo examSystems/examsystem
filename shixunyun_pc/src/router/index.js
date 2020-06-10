@@ -5,12 +5,23 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
-    name: 'Bar',
-    component: () => import('../components/Login.vue')
+    path: '/fb',
+    component: () => import('../components/ue.vue')
   },
   {
+    path: '/',
+    redirect: '/login'
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: login => require(['@/components/Login.vue'], login),
+    meta: [{ parentName: '', name: '登录' }]
+  },
+  {
+    // 学生基础信息
     path: '/Stu',
+    meta: [{ parentName: '', name: '学生基础信息' }],
     component: () => import('../views/Stu.vue'),
     children: [
       {
@@ -100,5 +111,13 @@ const routes = [
 const router = new VueRouter({
   routes
 })
-
+router.beforeEach(function (to, from, next) {
+  console.log('--' + localStorage.getItem('loginName') + to.path)
+  if (!localStorage.getItem('loginName')) {
+    if (to.path !== '/login') {
+      return next('/login')
+    }
+  }
+  next()
+})
 export default router
